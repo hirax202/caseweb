@@ -1,0 +1,31 @@
+<?php
+// Include connection and session
+include('conn.php');
+session_start();
+
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Function to get sales based on the period
+function getSales($period) {
+    global $conn;
+    if ($period == "today") {
+        $sql = "SELECT * FROM ticket_sales WHERE DATE(saleDate) = CURDATE()";
+    } elseif ($period == "monthly") {
+        $sql = "SELECT * FROM ticket_sales WHERE MONTH(saleDate) = MONTH(CURDATE())";
+    } else {
+        $sql = "SELECT * FROM ticket_sales";
+    }
+    $result = mysqli_query($conn, $sql);
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+// Example: Fetch today's sales
+$todaySales = getSales("today");
+$monthlySales = getSales("monthly");
+$totalSales = getSales("total");
+
+mysqli_close($conn);
+?>
